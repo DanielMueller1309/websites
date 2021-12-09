@@ -6,7 +6,7 @@
 <?php
 
 $output = shell_exec('cat index.php');
-echo "<pre>cat ausgeführt: $output</pre>";
+echo "cat ausgeführt: $output";
 
 echo "<br>";
 ?>
