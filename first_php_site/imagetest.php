@@ -2,7 +2,7 @@
 <html>
 <body>
 
-<img src="img_typo.jpg" alt=bild style="color:red;">;
+<img src="img_typo.jpg" alt=bild style="color:red;">
 
 </body>
-</html>
+</htmL>
