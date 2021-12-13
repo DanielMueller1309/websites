@@ -6,8 +6,7 @@ table, th, td {
 
 }
 </style>
-
-	<?php
+<?php
     echo "<table>";
     for ($i = 1; $i <= 3; $i++){
     	echo "<tr>";
@@ -31,7 +30,7 @@ table, th, td {
             	break;
         };
     }
-	?>
+?>
 
 
 
