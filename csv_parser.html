@@ -47,6 +47,8 @@
             reader.onload = function (e) {
               const text = e.target.result;
               const data = csvToArray(text);
+              // filter for empty index equal of place
+              data.splice(data.indexOf(""), 1);
               document.write(JSON.stringify(data));
             };
             
