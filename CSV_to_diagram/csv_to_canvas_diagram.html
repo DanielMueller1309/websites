@@ -1,0 +1,141 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<script>
+
+</script>
+</head>
+<body>
+<div id="chartContainer" style="height: 370px; width: 100%;"></div>
+<div id="inputmask" style="height: 100px; width: 30%;">
+  <form id="inputForm">
+    <input type="file" id="csvFile" accept=".csv" />
+    <br />
+    <input type="submit" value="Submit" />
+  </form>
+
+</div>
+<script>
+var data = []; //init data here for global use
+// what happend on load of window
+window.onload = function () {
+
+// bring csv to Array function
+function csvToArray(str, delimiter = ";") {
+            // slice from start of text to the first \n index
+            // use split to create an array from string by delimiter
+            const headers = str.slice(0, str.indexOf("\r\n")).split(delimiter);
+            // slice from \n index + 1 to the end of the text
+            // use split to create an array of each csv value row
+            const rows = str.slice(str.indexOf("\n") + 1).split("\r\n");
+            // Map the rows
+            // split values from each row into an array
+            // use headers.reduce to create an object
+            // object properties derived from headers:values
+            // the object passed as an element of the array
+            const arr = rows.map(function (row) {
+              const values = row.split(delimiter);
+              return values;
+            });     
+            return arr; // return the array
+          };
+//input function to read date from csv and parse it to array
+inputForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            var dps = [];
+            const input = csvFile.files[0];
+            const reader = new FileReader();
+      
+            reader.onload = function (e) {
+              const text = e.target.result;
+              var data = csvToArray(text);
+              data.splice(data.indexOf(""), 1); // filter for empty index equal of place
+              
+              
+              function dateslicer (time){
+                const d = new Date(parseInt(time.slice(6,10)), parseInt(time.slice(3,5))-1,parseInt(time.slice(0,2)), parseInt(time.slice(11,13)), parseInt(time.slice(14,16)));
+                return d;
+              };
+              
+              function parseDataPoints() {
+                for (var i = dps.length; i < data.length; i++)
+                  dps.push({
+                  x: dateslicer(data[i][0]),
+                  y: parseInt(data[i][1])
+                });
+              };
+
+              function addDataPoints(){
+                parseDataPoints();
+                chart.options.data[0].dataPoints = dps;
+                chart.render();
+              }
+              
+              //var data = [["20.01.2021 13:00", "9,4"],["20.01.2021 14:00", "8,8"]]; //used for experiments
+
+              // following chart var is from: https://canvasjs.com/javascript-charts/solid-dashed-line-chart/
+              var chart = new CanvasJS.Chart("chartContainer", {
+                animationEnabled: true,
+                theme: "light2",
+                title:{
+                  text: "Statistic mmol mirror"
+                },
+                axisX:{
+                  title: "Date",
+                  valueFormatString: "hh:mm DD MM YYYY",
+                  crosshair: {
+                    enabled: true,
+                    snapToDataPoint: true
+                  }
+                },
+                axisY: {
+                  title: "mmol/l",
+                  includeZero: true,
+                  crosshair: {
+                    enabled: true
+                  }
+                },
+                toolTip:{
+                  shared:true
+                },  
+                legend:{
+                  cursor:"pointer",
+                  verticalAlign: "bottom",
+                  horizontalAlign: "left",
+                  dockInsidePlotArea: true,
+                  itemclick: toogleDataSeries
+                },
+                data: [{
+                  type: "line",
+                  showInLegend: true,
+                  name: "Total Visit",
+                  markerType: "square",
+                  xValueFormatString: "DD MM YYYY hh mm",
+                  color: "#F08080",
+                  dataPoints: dps //dps[] is renewed every click on submit
+                }]
+              });
+
+              addDataPoints();
+
+              function toogleDataSeries(e){
+                if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                  e.dataSeries.visible = false;
+                } else{
+                  e.dataSeries.visible = true;
+                }
+                chart.render();
+              }
+
+            };
+            reader.readAsText(input);
+          });
+
+
+}
+
+</script>
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+</body>
+</html>
