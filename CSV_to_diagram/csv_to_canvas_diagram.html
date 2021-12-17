@@ -6,14 +6,24 @@
 </script>
 </head>
 <body>
-<div id="chartContainer" style="height: 370px; width: 100%;"></div>
-<div id="inputmask" style="height: 100px; width: 30%;">
+<div id="chartContainer"></div>
+<div id="userinput">
+  <div id="inputmask" >
   <form id="inputForm">
     <input type="file" id="csvFile" accept=".csv" />
-    <br />
     <input type="submit" value="Submit" />
   </form>
-
+  </div>
+  <div id="changedatemask">
+    <form id="dateForm">
+      <input type="button" value="<" />
+      <input type="date" value=""/>
+      <em>bis</em>
+      <input type="date" value=""/>
+      <input type="button" value=">" />
+      <input type="button" value="Show time scale" />
+    </form>
+  </div>
 </div>
 <script>
 var data = []; //init data here for global use
