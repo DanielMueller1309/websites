@@ -38,10 +38,11 @@
     <form id="dateForm">
       <input type="button" value="<" />
       <input id="from_date" type="date" />
+      <input id="from_time" type="time" />
       <em>bis</em>
       <input id="to_date" type="date" value= ""/>
+      <input id="to_time" type="time" />
       <input type="button" value=">" />
-      <input type="button" value="Show time scale" />
     </form>
   </div>
 </div>
@@ -52,18 +53,40 @@ var dps = [];
 // what happend on load of window;
 window.onload = function () {
   
-  //set to_date to today
+  //timescale
+  var secound
+  var minute 
+  var hour = 1
+  
+  var days = 0.5;
+  // source: https://stackoverflow.com/questions/28729634/set-values-in-input-type-date-and-time-in-javascript//
   var to_date = document.getElementById("to_date");
-  var date = new Date();
+  var to_time = document.getElementById("to_time");
+  
+  var date = new Date(2021, 0, 20, 21, 0); //testdate var
+  //var date = new Date();
+  
   var currentDate = date.toISOString().substring(0,10);
-  //var currentTime = date.toISOString().substring(11,16); //maybe need laiter
+  var currentTime = date.toISOString().substring(11,16); //maybe need laiter
+  
   to_date.value = currentDate;
-
+  to_time.value = currentTime;
+  
+  hour = parseInt(to_time.value.substring(0,2));
+  minute = parseInt(to_time.value.substring(3,5));
+  var to_time_ms = (hour * 60 * 60 * 1000) + (minute * 60 * 1000);
+  var alt_to_time_ms = ((1000 * secound)+ (60000 * minute) + (3600000 * hour) + (86400000 * day) + );
+  console.log(to_time_ms);
+  console.log(alt_to_time_ms);
   //set from_date to 1 week ago
   var from_date = document.getElementById("from_date");
-  var days = 7;
-  var xdays_befor_date = new Date(date.getTime() - (days * 24 * 60 * 60 * 1000)).toISOString().substring(0,10);
-  from_date.value = xdays_befor_date;
+  var from_time = document.getElementById("from_time");
+  
+  
+  var xdays_befor_date = new Date(date.getTime() - (days * 24 * 60 * 60 * 1000));
+
+  hour = hour - 0;
+  minute = minute;
 
   var from_time_ms = (stunde  * 60 * 60 * 1000) + (minute * 60 * 1000);
   from_time.value = xdays_befor_date.toISOString().substring(11,16);
