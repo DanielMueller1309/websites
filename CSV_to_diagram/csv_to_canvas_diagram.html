@@ -65,119 +65,137 @@ window.onload = function () {
   var xdays_befor_date = new Date(date.getTime() - (days * 24 * 60 * 60 * 1000)).toISOString().substring(0,10);
   from_date.value = xdays_befor_date;
 
-// bring csv to Array function
-function csvToArray(str, delimiter = ";") {
-            // slice from start of text to the first \n index
-            // use split to create an array from string by delimiter
-            const headers = str.slice(0, str.indexOf("\r\n")).split(delimiter);
-            // slice from \n index + 1 to the end of the text
-            // use split to create an array of each csv value row
-            const rows = str.slice(str.indexOf("\n") + 1).split("\r\n");
-            // Map the rows
-            // split values from each row into an array
-            // use headers.reduce to create an object
-            // object properties derived from headers:values
-            // the object passed as an element of the array
-            const arr = rows.map(function (row) {
-              const values = row.split(delimiter);
-              return values;
-            });     
-            return arr; // return the array
-          };
-//input function to read date from csv and parse it to array
-inputForm.addEventListener("submit", function (e) {
-            e.preventDefault();
-            var dps = [];
-            const input = csvFile.files[0];
-            const reader = new FileReader();
+  var from_time_ms = (stunde  * 60 * 60 * 1000) + (minute * 60 * 1000);
+  from_time.value = xdays_befor_date.toISOString().substring(11,16);
+  from_date.value = xdays_befor_date.toISOString().substring(0,10);
+  
+  
+  //var min_time = new Date(new Date(from_date.value).getTime() + from_time_ms)
+  //var max_time = new Date(new Date(to_date.value).getTime + to_time_ms)
+ 
+  // bring csv to Array function
+  function csvToArray(str, delimiter = ";") {
+    // slice from start of text to the first \n index
+    // use split to create an array from string by delimiter
+    const headers = str.slice(0, str.indexOf("\n")).split(delimiter);
+    // slice from \n index + 1 to the end of the text
+    // use index to use from after headers, replace \r delimiter and split by \n to create an array of each csv value row
+    const rows = str.slice(str.indexOf("\n") + 1).replace(/\r/gi, '').split("\n")
+    //row
+    // Map the rows
+    // split values from each row into an array
+    // use headers.reduce to create an object
+    // object properties derived from headers:values
+    // the object passed as an element of the array
+    const arr = rows.map(function (row) {
+      const values = row.split(delimiter);
+      return values;
+    });     
+    return arr; // return the array
+    };
+  
+  function dateslicer (time){
+        const d = new Date(parseInt(time.slice(6,10)), parseInt(time.slice(3,5))-1,parseInt(time.slice(0,2)), parseInt(time.slice(11,13)), parseInt(time.slice(14,16)));
+        return d;
+      };
       
-            reader.onload = function (e) {
-              const text = e.target.result;
-              var data = csvToArray(text);
-              data.splice(data.indexOf(""), 1); // filter for empty index equal of place
-              
-              
-              function dateslicer (time){
-                const d = new Date(parseInt(time.slice(6,10)), parseInt(time.slice(3,5))-1,parseInt(time.slice(0,2)), parseInt(time.slice(11,13)), parseInt(time.slice(14,16)));
-                return d;
-              };
-              
-              function parseDataPoints() {
-                for (var i = dps.length; i < data.length; i++)
-                  dps.push({
-                  x: dateslicer(data[i][0]),
-                  y: parseInt(data[i][1])
-                });
-              };
-
-              function addDataPoints(){
-                parseDataPoints();
-                chart.options.data[0].dataPoints = dps;
-                chart.render();
-              }
-              
-              //var data = [["20.01.2021 13:00", "9,4"],["20.01.2021 14:00", "8,8"]]; //used for experiments
-
-              // following chart var is from: https://canvasjs.com/javascript-charts/solid-dashed-line-chart/
-              var chart = new CanvasJS.Chart("chartContainer", {
-                animationEnabled: true,
-                theme: "light2",
-                title:{
-                  text: "Statistic mmol mirror"
-                },
-                axisX:{
-                  title: "Date",
-                  valueFormatString: "hh:mm DD MM YYYY",
-                  crosshair: {
-                    enabled: true,
-                    snapToDataPoint: true
-                  }
-                },
-                axisY: {
-                  title: "mmol/l",
-                  includeZero: true,
-                  crosshair: {
-                    enabled: true
-                  }
-                },
-                toolTip:{
-                  shared:true
-                },  
-                legend:{
-                  cursor:"pointer",
-                  verticalAlign: "bottom",
-                  horizontalAlign: "left",
-                  dockInsidePlotArea: true,
-                  itemclick: toogleDataSeries
-                },
-                data: [{
-                  type: "line",
-                  showInLegend: true,
-                  name: "Total Visit",
-                  markerType: "square",
-                  xValueFormatString: "DD MM YYYY hh mm",
-                  color: "#F08080",
-                  dataPoints: dps //dps[] is renewed every click on submit
-                }]
-              });
-
-              addDataPoints();
-
-              function toogleDataSeries(e){
-                if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
-                  e.dataSeries.visible = false;
-                } else{
-                  e.dataSeries.visible = true;
-                }          
-                chart.render();
-              }
-
-            };
-            reader.readAsText(input);
+  function parseDataPoints() {
+        for (var i = dps.length; i < data.length; i++){
+          dps.push({
+          x: dateslicer(data[i][0]),
+          y: parseFloat(data[i][1])
           });
+        }
+  };
 
-          
-}
+  function addDataPoints(){
+    parseDataPoints();
+    chart.options.data[0].dataPoints = dps;
+    chart.render();
+  }
+  //input function to read date from csv and parse it to array
+  inputForm.addEventListener("submit", function (e) {
+              e.preventDefault();
+              
+              const input = csvFile.files[0];
+              const reader = new FileReader();4
+        
+              reader.onload = function (e) {
+                const text = e.target.result;
+                data = csvToArray(text);
+
+                data.splice(data.indexOf(""), 1); // filter for empty index equal of place
+               
+                for (i = 0; i <= data.length-1; i++){
+                  //console.log(data[i][0]);
+                  if (data[i][0] == "" || data[i][1] == ""){
+                     data.splice(i, 1);
+                     i--;
+                  }
+
+                };
+                
+                // following chart var is from: https://canvasjs.com/javascript-charts/solid-dashed-line-chart/
+                chart = new CanvasJS.Chart("chartContainer", {
+                  animationEnabled: true,
+                  theme: "light2",
+                  title:{
+                    text: "Statistic mmol mirror"
+                  },
+                  axisX:{
+                    title: "Date",
+                    valueFormatString: "hh:mm DD MM YYYY",
+                    crosshair: {
+                      enabled: true,
+                      snapToDataPoint: true
+                    },
+                    minimum: new Date(from_date.value +" "+ from_time.value),
+                    maximum: new Date(to_date.value +" "+ to_time.value),
+                  },
+                  axisY: {
+                    title: "mmol/l",
+                    includeZero: true,
+                    crosshair: {
+                      enabled: true
+                    }
+                  },
+                  toolTip:{
+                    shared:true
+                  },  
+                  legend:{
+                    cursor:"pointer",
+                    verticalAlign: "bottom",
+                    horizontalAlign: "left",
+                    dockInsidePlotArea: true,
+                    itemclick: toogleDataSeries
+                  },
+                  data: [{
+                    type: "line",
+                    showInLegend: true,
+                    name: "Mirror",
+                    markerType: "square",
+                    xValueFormatString: "DD MM YYYY hh mm",
+                    color: "#F08080",
+                    dataPoints: dps //dps[] is renewed every click on submit
+                  }]
+                });
+
+                addDataPoints();
+
+                function toogleDataSeries(e){
+                  if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                    e.dataSeries.visible = false;
+                  } else{
+                    e.dataSeries.visible = true;
+                  }          
+                  chart.render();
+                }
+
+              };
+              reader.readAsText(input);
+  });
+
+} 
 
 </script>
 <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
